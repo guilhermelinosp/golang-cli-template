@@ -1,0 +1,16 @@
+name: codeql
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  codeql:
+    uses: guilhermelinosp/ci-templates/.github/workflows/codeql.yml@main
+    with:
+      languages: '[{"language":"actions","build-mode":"none"},{"language":"go","build-mode":"autobuild"}]'
