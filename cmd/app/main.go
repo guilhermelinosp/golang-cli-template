@@ -13,5 +13,5 @@ func main() {
 	flag.StringVar(&name, "name", "world", "name to greet")
 	flag.Parse()
 
-	fmt.Fprintf(os.Stdout, "hello %s\n", name)
+	_, _ = fmt.Fprintf(os.Stdout, "hello %s\n", name)
 }
