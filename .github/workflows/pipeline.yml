@@ -14,5 +14,3 @@ jobs:
   build:
     needs: [release]
     uses: guilhermelinosp/ci-templates/.github/workflows/go-build.yml@main
-    with:
-      version: ${{ needs.release.outputs.version }}
