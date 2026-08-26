@@ -2,6 +2,12 @@
 .DS_Store
 Thumbs.db
 
+# Neutralize user-global ignores (~/.config/git/ignore) that would
+# otherwise swallow template paths: 'build/' and '.github/'. Project rules
+# outrank the global file, keeping these tracked for every derived repo.
+!internal/build/
+!.github/
+
 # IDE
 .vscode/
 .idea/
