@@ -1,4 +1,4 @@
-# PR labeler rules (consumed by .github/workflows/pr-check.yml -> ci-templates labeler)
+# PR labeler rules (consumed by .github/workflows/security.yml)
 # See https://github.com/actions/labeler (v7 schema)
 
 "github_actions":
@@ -6,7 +6,7 @@
       - any-glob-to-any-file:
           - ".github/**"
           - ".gitignore"
-          - ".lefthook.yml"
+          - "lefthook.yml"
           - ".golangci.yml"
           - ".yamllint"
           - "Makefile"

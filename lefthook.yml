@@ -1,0 +1,29 @@
+---
+# lefthook.yml — pre-commit quality gates.
+# Install once per clone: `lefthook install`
+# Tools are non-fatal when locally absent (CI enforces them authoritatively).
+output: false
+
+pre-commit:
+  parallel: true
+  commands:
+    fmt:
+      glob: "*.go"
+      run: gofmt -w {staged_files} && git add {staged_files}
+    vet:
+      run: go vet ./...
+    test:
+      run: go test -count=1 ./...
+    boundary:
+      run: make verify
+    yamllint:
+      glob: "*.{yaml,yml}"
+      run: yamllint {staged_files}
+    secrets-scan:
+      glob: "*.{yaml,yml,go,json,sh}"
+      run: gitleaks detect --source . --no-git --redact || true
+
+commit-msg:
+  commands:
+    conventional:
+      run: 'grep -Eq "^(feat|fix|docs|style|refactor|perf|test|ci|chore|revert|build)(\(.+\))?!?: .+" {1}'

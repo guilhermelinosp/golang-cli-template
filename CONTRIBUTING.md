@@ -19,7 +19,22 @@ refactor: simplify validation logic
 chore: bump dependencies
 ```
 
-The `release.yml` workflow uses commit messages to determine semver bumps.
+The `release.yml` workflow (GoReleaser) uses commit messages to build the changelog.
+
+## Development workflow
+
+```bash
+make setup    # once per clone (template bootstrap only)
+lefthook install
+make fmt      # format
+make lint     # golangci-lint
+make race     # tests with race detector
+make cover    # coverage report
+make build    # stamped binary into bin/
+```
+
+Architectural rule: `spf13/cobra` may ONLY be imported inside
+`internal/cli/cobra/`. `make verify` enforces it — run it before pushing.
 
 ## Pull Requests
 
