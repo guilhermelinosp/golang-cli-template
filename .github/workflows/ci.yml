@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test & lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # full history for git-describe versions
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify module integrity
+        run: |
+          go mod verify
+          go mod tidy && git diff --exit-code go.mod go.sum || {
+            echo "::error::go.mod/go.sum out of sync — run 'go mod tidy' and commit"
+            exit 1
+          }
+
+      - name: Architectural boundary guard
+        run: make verify
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
+      - name: Test with coverage
+        run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Build with stamped metadata
+        run: make build
+
+      - name: Smoke binary
+        run: ./bin/golang-cli-template --version
