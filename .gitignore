@@ -31,4 +31,8 @@ vendor/
 
 # Test
 coverage.out
-*.cover
+coverage.html
+
+# Compiled binary at repo root (derived projects' default name)
+/app
+/app.exe
