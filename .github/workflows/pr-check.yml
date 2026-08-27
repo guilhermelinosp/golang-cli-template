@@ -9,5 +9,8 @@ permissions:
   security-events: write
 
 jobs:
-  codeql-only:
-    uses: guilhermelinosp/ci-templates/.github/workflows/codeql-analysis.yml@5f56a4b98dc5400cbd36c60600aeb5f1580654e1
+  call-empty:
+    uses: guilhermelinosp/ci-templates/.github/workflows/c-probe-empty.yml@3477522959a5c9875e1fb912e7a1015039d46e78
+
+  call-perms:
+    uses: guilhermelinosp/ci-templates/.github/workflows/c-probe-perms.yml@3477522959a5c9875e1fb912e7a1015039d46e78
