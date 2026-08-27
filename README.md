@@ -286,7 +286,7 @@ pipe-and-script friendly first.
 
 | Workflow       | Trigger | Jobs (all org reusables from [ci-templates](https://github.com/guilhermelinosp/ci-templates)) |
 | -------------- | ------- | ---------------------------------------------------------------------------------------------- |
-| `pr-check.yml` | PR      | shellcheck, merge-check, gitleaks, labeler, `go-quality` (+boundary guard), dependency-review, govulncheck, CodeQL |
+| `pr-check.yml` | PR      | shellcheck, merge-check, gitleaks, labeler, `go-quality` (+boundary guard), govulncheck — org reusables · CodeQL inline per-repo |
 | `pipeline.yml` | push to `main` | semver release → go test/build → GoReleaser cross-platform binaries onto the release (+boundary guard) → govulncheck |
 
 Secret scanning is native to GitHub — enable *Push protection* under repo

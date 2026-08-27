@@ -6,11 +6,40 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
+  checks: write
   security-events: write
 
-jobs:
-  call-empty:
-    uses: guilhermelinosp/ci-templates/.github/workflows/c-probe-empty.yml@3477522959a5c9875e1fb912e7a1015039d46e78
+concurrency:
+  group: pr-check-${{ github.ref }}
+  cancel-in-progress: true
 
-  call-perms:
-    uses: guilhermelinosp/ci-templates/.github/workflows/c-probe-perms.yml@3477522959a5c9875e1fb912e7a1015039d46e78
+jobs:
+  lint:
+    uses: guilhermelinosp/ci-templates/.github/workflows/shellcheck.yml@main
+
+  merge-check:
+    uses: guilhermelinosp/ci-templates/.github/workflows/merge-check.yml@main
+
+  gitleaks:
+    uses: guilhermelinosp/ci-templates/.github/workflows/gitleaks.yml@main
+
+  labeler:
+    uses: guilhermelinosp/ci-templates/.github/workflows/labeler.yml@main
+
+  # Full Go gate from the org reusable: module integrity, vet, boundary
+  # guard, race tests + coverage, canonical lint, build smoke and
+  # dependency review (embedded).
+  go-quality:
+    uses: guilhermelinosp/ci-templates/.github/workflows/go-quality.yml@main
+    with:
+      extra-commands: make verify
+      build-command: make build
+      smoke-command: ./bin/golang-cli-template --version
+
+  govulncheck:
+    uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main
+
+# CodeQL runs via the per-repo inline workflow (.github/workflows/codeql.yml):
+# the reusable variant still triggers GitHub-side startup_failure across
+# callers regardless of content/pinning; revisit after a clean-room repro.
