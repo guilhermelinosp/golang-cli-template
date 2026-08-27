@@ -1,20 +1,20 @@
-name: ci
+# Self-contained Go quality gate (org pattern after the codeql decision in #5/#6:
+# per-repo workflows instead of reusable ones). Runs on every PR touching Go.
+name: go
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    branches: ["main"]
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: go-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  quality:
     name: test & lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -44,11 +44,6 @@ jobs:
       - name: Vet
         run: go vet ./...
 
-      - name: Lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
-
       - name: Test with coverage
         run: go test -race -covermode=atomic -coverprofile=coverage.out ./...
 
@@ -61,8 +56,45 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
       - name: Build with stamped metadata
         run: make build
 
       - name: Smoke binary
         run: ./bin/golang-cli-template --version
+
+  dependency-review:
+    name: dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  govulncheck:
+    name: vulnerability scan (stdlib-aware)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Run govulncheck
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: ""
+          go-package: ./...

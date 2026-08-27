@@ -19,7 +19,8 @@ refactor: simplify validation logic
 chore: bump dependencies
 ```
 
-The `release.yml` workflow (GoReleaser) uses commit messages to build the changelog.
+Pushes to `main` trigger `pipeline.yml`: the org reusable bumps semver and tags,
+then GoReleaser builds cross-platform binaries using commit messages for the changelog.
 
 ## Development workflow
 

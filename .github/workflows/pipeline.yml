@@ -1,0 +1,75 @@
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+
+permissions: write-all
+
+jobs:
+  # Semver bump + git tag + GitHub release (org reusable).
+  release:
+    uses: guilhermelinosp/ci-templates/.github/workflows/release.yml@main
+    secrets: inherit
+
+  test:
+    needs: [release]
+    uses: guilhermelinosp/ci-templates/.github/workflows/go-test.yml@main
+
+  build:
+    needs: [release]
+    uses: guilhermelinosp/ci-templates/.github/workflows/go-build.yml@main
+
+  # Cross-platform binaries + checksums attached to the release created above.
+  binaries:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Fetch tag created by release job
+        run: git fetch --tags --force && git checkout "$(git describe --tags --abbrev=0)"
+
+      - name: Architectural boundary guard
+        run: make verify
+
+      - name: Release cross-platform binaries (GoReleaser)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  # Supply-chain guard (stdlib-native vuln analysis with call-graph reachability).
+  govulncheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...

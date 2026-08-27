@@ -284,12 +284,12 @@ pipe-and-script friendly first.
 
 ## CI / CD
 
-| Workflow      | Trigger           | Jobs                                                     |
-| ------------- | ----------------- | -------------------------------------------------------- |
-| `ci.yml`      | push/PR           | mod verify, boundary guard, vet, golangci-lint, race+coverage tests, stamped build, smoke |
-| `security.yml`| push/PR           | govulncheck, dependency review, PR labeler               |
-| `codeql.yml`  | PR                | CodeQL security & quality analysis (Go + Actions)        |
-| `release.yml` | tag `v*`          | GoReleaser publish                                        |
+| Workflow        | Trigger           | Jobs                                                     |
+| --------------- | ----------------- | -------------------------------------------------------- |
+| `pr-check.yml`  | PR                | shellcheck, merge-check, gitleaks, labeler (org reusables)|
+| `go.yml`        | PR                | tidy+verify, boundary guard, vet, race tests + coverage, golangci-lint, stamped build smoke, dependency review, govulncheck |
+| `codeql.yml`    | PR                | CodeQL security & quality analysis (Go + Actions)         |
+| `pipeline.yml`  | push to `main`    | semver release tag (org reusable) → go test/build reusables → GoReleaser cross-platform binaries onto the release → govulncheck |
 
 Secret scanning is native to GitHub — enable *Push protection* under repo
 Settings → Code security. Commits follow [Conventional Commits](https://www.conventionalcommits.org);

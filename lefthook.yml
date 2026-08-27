@@ -18,7 +18,14 @@ pre-commit:
       run: make verify
     yamllint:
       glob: "*.{yaml,yml}"
-      run: yamllint {staged_files}
+      # Inline style: no repo config file needed; keeps structural checks
+      # (syntax, duplicate keys) and drops Actions-workflow style noise
+      # ("on:" truthy, line length, doc start).
+      run: >-
+        yamllint -d "{extends: default, rules: {document-start: disable,
+        truthy: {check-keys: false}, line-length: {max: 120},
+        comments: {min-spaces-from-content: 1},
+        comments-indentation: disable, empty-lines: {max: 1}}}" {staged_files}
     secrets-scan:
       glob: "*.{yaml,yml,go,json,sh}"
       run: gitleaks detect --source . --no-git --redact || true
