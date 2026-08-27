@@ -2,7 +2,7 @@ name: pr-check
 
 on:
   pull_request:
-    branches: [main]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
