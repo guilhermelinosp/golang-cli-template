@@ -31,3 +31,9 @@ jobs:
 
   codeql:
     uses: guilhermelinosp/ci-templates/.github/workflows/codeql.yml@main
+
+  govulncheck:
+    uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main
+
+  codeql:
+    uses: guilhermelinosp/ci-templates/.github/workflows/codeql.yml@main
