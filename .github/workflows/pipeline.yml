@@ -9,26 +9,26 @@ permissions: write-all
 jobs:
   # Semver bump + git tag + GitHub Release (org reusable).
   release:
-    uses: guilhermelinosp/ci-templates/.github/workflows/release.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/release.yml@main
     secrets: inherit
 
   test:
     needs: [release]
-    uses: guilhermelinosp/ci-templates/.github/workflows/go-test.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/go-test.yml@main
 
   build:
     needs: [release]
-    uses: guilhermelinosp/ci-templates/.github/workflows/go-build.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/go-build.yml@main
 
   # Cross-platform binaries + checksums onto the release above; the boundary
   # guard reruns here so merged mains can never publish leaking engine types.
   binaries:
     needs: [build]
-    uses: guilhermelinosp/ci-templates/.github/workflows/goreleaser-publish.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/goreleaser-publish.yml@main
     with:
       pre-release-commands: make verify
 
   # Supply-chain guard: stdlib vuln analysis with reachability.
   govulncheck:
     needs: [release]
-    uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/govulncheck.yml@main
