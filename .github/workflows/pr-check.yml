@@ -2,12 +2,17 @@ name: pr-check
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [main]
 
 permissions:
   contents: read
   pull-requests: write
   checks: write
+  security-events: write
+
+concurrency:
+  group: pr-check-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -22,5 +27,19 @@ jobs:
   labeler:
     uses: guilhermelinosp/ci-templates/.github/workflows/labeler.yml@main
 
-  # Go quality gates are self-contained per org pattern: see go.yml
-  # (tidy/boundary/vet/test-race/lint + dependency-review + govulncheck).
+  # Full Go gate from the org reusable: module integrity, vet, boundary
+  # guard, race tests + coverage, canonical lint, build smoke and
+  # dependency review (embedded).
+  go-quality:
+    uses: guilhermelinosp/ci-templates/.github/workflows/go-quality.yml@main
+    with:
+      extra-commands: make verify
+      build-command: make build
+      smoke-command: ./bin/golang-cli-template --version
+
+  govulncheck:
+    uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main
+
+# CodeQL runs via the per-repo inline workflow (.github/workflows/codeql.yml):
+# the reusable variant still triggers GitHub-side startup_failure across
+# callers regardless of content/pinning; revisit after a clean-room repro.

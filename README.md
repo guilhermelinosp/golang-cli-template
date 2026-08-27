@@ -284,12 +284,10 @@ pipe-and-script friendly first.
 
 ## CI / CD
 
-| Workflow        | Trigger           | Jobs                                                     |
-| --------------- | ----------------- | -------------------------------------------------------- |
-| `pr-check.yml`  | PR                | shellcheck, merge-check, gitleaks, labeler (org reusables)|
-| `go.yml`        | PR                | tidy+verify, boundary guard, vet, race tests + coverage, golangci-lint, stamped build smoke, dependency review, govulncheck |
-| `codeql.yml`    | PR                | CodeQL security & quality analysis (Go + Actions)         |
-| `pipeline.yml`  | push to `main`    | semver release tag (org reusable) → go test/build reusables → GoReleaser cross-platform binaries onto the release → govulncheck |
+| Workflow       | Trigger | Jobs (all org reusables from [ci-templates](https://github.com/guilhermelinosp/ci-templates)) |
+| -------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `pr-check.yml` | PR      | shellcheck, merge-check, gitleaks, labeler, `go-quality` (+boundary guard), govulncheck — org reusables · CodeQL inline per-repo |
+| `pipeline.yml` | push to `main` | semver release → go test/build → GoReleaser cross-platform binaries onto the release (+boundary guard) → govulncheck |
 
 Secret scanning is native to GitHub — enable *Push protection* under repo
 Settings → Code security. Commits follow [Conventional Commits](https://www.conventionalcommits.org);
