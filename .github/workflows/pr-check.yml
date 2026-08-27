@@ -28,16 +28,14 @@ jobs:
     uses: guilhermelinosp/ci-templates/.github/workflows/labeler.yml@main
 
   # Full Go quality gate (module integrity, vet, boundary guard via
-  # extra-commands, race tests + coverage, canonical lint, build, smoke).
+  # extra-commands, race tests + coverage, canonical lint, build smoke,
+  # dependency review).
   go-quality:
     uses: guilhermelinosp/ci-templates/.github/workflows/go-quality.yml@main
     with:
       extra-commands: make verify
       build-command: make build
       smoke-command: ./bin/golang-cli-template --version
-
-  dependency-review:
-    uses: guilhermelinosp/ci-templates/.github/workflows/dependency-review.yml@main
 
   govulncheck:
     uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main

@@ -20,8 +20,8 @@ jobs:
     needs: [release]
     uses: guilhermelinosp/ci-templates/.github/workflows/go-build.yml@main
 
-  # Cross-platform binaries + checksums onto the release above; the boundary
-  # guard reruns here so merged mains can never publish leaking engine types.
+  # Cross-platform binaries + checksums onto the release above; boundary
+  # guard reruns so merged mains can never publish leaking engine types.
   binaries:
     needs: [build]
     uses: guilhermelinosp/ci-templates/.github/workflows/goreleaser-publish.yml@main
