@@ -10,4 +10,4 @@ permissions:
 
 jobs:
   codeql-only:
-    uses: guilhermelinosp/ci-templates/.github/workflows/codeql.yml@42c62912dd074fb8ad86c8703cb2d8300b424d61
+    uses: guilhermelinosp/ci-templates/.github/workflows/codeql-analysis.yml@48298ecfe12661d07f7d4bf83448518c1870f4f7
