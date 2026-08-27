@@ -28,3 +28,12 @@ jobs:
       extra-commands: make verify
       build-command: make build
       smoke-command: ./bin/golang-cli-template --version
+
+  dependency-review:
+    uses: guilhermelinosp/ci-templates/.github/workflows/dependency-review.yml@main
+
+  govulncheck:
+    uses: guilhermelinosp/ci-templates/.github/workflows/govulncheck.yml@main
+
+  codeql:
+    uses: guilhermelinosp/ci-templates/.github/workflows/codeql.yml@main
