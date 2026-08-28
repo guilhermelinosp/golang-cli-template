@@ -1,6 +1,10 @@
 name: pipeline
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.github/**'
   workflow_dispatch:
 
 permissions: write-all
