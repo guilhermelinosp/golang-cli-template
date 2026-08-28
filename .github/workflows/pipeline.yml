@@ -26,7 +26,7 @@ jobs:
   # Cross-platform binaries + checksums onto the release above; the boundary
   # guard reruns here so merged mains can never publish leaking engine types.
   binaries:
-    needs: [build]
+    needs: [build, release]
     uses: guilhermelinosp/templates/.github/workflows/goreleaser-publish.yml@main
     with:
       pre-release-commands: make verify
