@@ -1,5 +1,9 @@
 name: pipeline
 
+# Library CI: cut a semver tag + GitHub Release on every code change to main
+# (changes limited to .github/ are ignored so CI edits never trigger a
+# release), then run the quality gate.
+
 on:
   push:
     branches: [main]
@@ -7,31 +11,21 @@ on:
       - '.github/**'
   workflow_dispatch:
 
-permissions: write-all
+permissions:
+  contents: write
 
 jobs:
-  # Semver bump + git tag + GitHub Release (org reusable).
   release:
-    uses: guilhermelinosp/templates/.github/workflows/release.yml@main
-    secrets: inherit
+    name: release
+    uses: guilhermelinosp/templates/.github/workflows/release.yml@9fe39322263723d320cdce780f00d5926059798a # main
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
 
-  test:
+  quality:
+    name: quality
     needs: [release]
-    uses: guilhermelinosp/templates/.github/workflows/go-test.yml@main
-
-  build:
-    needs: [release]
-    uses: guilhermelinosp/templates/.github/workflows/go-build.yml@main
-
-  # Cross-platform binaries + checksums onto the release above; the boundary
-  # guard reruns here so merged mains can never publish leaking engine types.
-  binaries:
-    needs: [build, release]
-    uses: guilhermelinosp/templates/.github/workflows/goreleaser-publish.yml@main
+    uses: guilhermelinosp/templates/.github/workflows/lib-quality.yml@9fe39322263723d320cdce780f00d5926059798a # main
     with:
-      pre-release-commands: make verify
-
-  # Supply-chain guard: stdlib vuln analysis with reachability.
-  govulncheck:
-    needs: [release]
-    uses: guilhermelinosp/templates/.github/workflows/govulncheck.yml@main
+      go-version-file: go.mod
